@@ -1,8 +1,18 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Bai_Jamjuree, Atkinson_Hyperlegible } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const baiJamjuree = Bai_Jamjuree({ 
+  subsets: ["latin"],
+  weight: ["200", "300", "400", "500", "600", "700"],
+  variable: "--font-bai-jamjuree"
+});
+
+const atkinsonHyperlegible = Atkinson_Hyperlegible({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-atkinson-hyperlegible"
+});
 
 export const metadata: Metadata = {
   title: "Open Lovable",
@@ -16,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${baiJamjuree.variable} ${atkinsonHyperlegible.variable} font-sans`}>
         {children}
       </body>
     </html>
