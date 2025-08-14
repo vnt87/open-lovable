@@ -26,7 +26,9 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import CodeApplicationProgress, { type CodeApplicationState } from '@/components/CodeApplicationProgress';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
-import { SparklesCore } from '@/components/ui/sparkles';
+import ParticlesComponent from '@/components/ui/particles';
+import { SparklesText } from '@/components/ui/sparkles-text';
+import { ModelSelector } from '@/components/ModelSelector';
 
 interface SandboxData {
   sandboxId: string;
@@ -2788,7 +2790,7 @@ Focus on the key sections and content, making it clean and modern.`;
               {/* Header with Sparkles Effect */}
               <div className="text-center relative">
                 <div className="w-full absolute inset-0 h-screen">
-                  <SparklesCore
+                  <ParticlesComponent
                     id="tsparticlesfullpage"
                     background="transparent"
                     minSize={0.6}
@@ -2799,9 +2801,13 @@ Focus on the key sections and content, making it clean and modern.`;
                     speed={1}
                   />
                 </div>
-                <h1 className="text-[2.5rem] lg:text-[3.8rem] text-center text-white font-semibold tracking-tight leading-[0.9] animate-[fadeIn_0.8s_ease-out] relative z-20">
-                  <span className="hidden md:inline">Re:Imagine</span>
-                  <span className="md:hidden">Re:Imagine</span>
+                <h1 className="text-[2.5rem] lg:text-[3.8rem] text-center text-white font-black tracking-tight leading-[0.9] animate-[fadeIn_0.8s_ease-out] relative z-20">
+                  <SparklesText className="hidden md:inline" sparklesCount={15} colors={{ first: "#60a5fa", second: "#a855f7" }}>
+                    Re:Imagine
+                  </SparklesText>
+                  <SparklesText className="md:hidden" sparklesCount={10} colors={{ first: "#60a5fa", second: "#a855f7" }}>
+                    Re:Imagine
+                  </SparklesText>
                 </h1>
                 <motion.p 
                   className="text-base lg:text-lg max-w-lg mx-auto mt-2.5 text-gray-300 text-center text-balance relative z-20"
@@ -2964,10 +2970,9 @@ Focus on the key sections and content, making it clean and modern.`;
               
               {/* Model Selector */}
               <div className="mt-6 flex items-center justify-center animate-[fadeIn_1s_ease-out] relative z-30">
-                <select
+                <ModelSelector
                   value={aiModel}
-                  onChange={(e) => {
-                    const newModel = e.target.value;
+                  onValueChange={(newModel) => {
                     setAiModel(newModel);
                     const params = new URLSearchParams(searchParams);
                     params.set('model', newModel);
@@ -2976,17 +2981,10 @@ Focus on the key sections and content, making it clean and modern.`;
                     }
                     router.push(`/?${params.toString()}`);
                   }}
-                  className="px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#36322F] focus:border-transparent relative z-30"
-                  style={{
-                    boxShadow: '0 0 0 1px #e3e1de66, 0 1px 2px #5f4a2e14'
-                  }}
-                >
-                  {appConfig.ai.availableModels.map(model => (
-                    <option key={model} value={model}>
-                      {appConfig.ai.modelDisplayNames[model as keyof typeof appConfig.ai.modelDisplayNames] || model}
-                    </option>
-                  ))}
-                </select>
+                  models={appConfig.ai.availableModels}
+                  modelDisplayNames={appConfig.ai.modelDisplayNames}
+                  className="relative z-30"
+                />
               </div>
             </div>
           </div>
@@ -3005,10 +3003,9 @@ Focus on the key sections and content, making it clean and modern.`;
         </div>
         <div className="flex items-center gap-2">
           {/* Model Selector - Left side */}
-          <select
+          <ModelSelector
             value={aiModel}
-            onChange={(e) => {
-              const newModel = e.target.value;
+            onValueChange={(newModel) => {
               setAiModel(newModel);
               const params = new URLSearchParams(searchParams);
               params.set('model', newModel);
@@ -3017,14 +3014,9 @@ Focus on the key sections and content, making it clean and modern.`;
               }
               router.push(`/?${params.toString()}`);
             }}
-            className="px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#36322F] focus:border-transparent"
-          >
-            {appConfig.ai.availableModels.map(model => (
-              <option key={model} value={model}>
-                {appConfig.ai.modelDisplayNames[model as keyof typeof appConfig.ai.modelDisplayNames] || model}
-              </option>
-            ))}
-          </select>
+            models={appConfig.ai.availableModels}
+            modelDisplayNames={appConfig.ai.modelDisplayNames}
+          />
           <Button
             variant="code"
             onClick={() => createSandbox()}
