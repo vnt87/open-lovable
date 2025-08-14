@@ -2963,7 +2963,7 @@ Focus on the key sections and content, making it clean and modern.`;
               </form>
               
               {/* Model Selector */}
-              <div className="mt-6 flex items-center justify-center animate-[fadeIn_1s_ease-out]">
+              <div className="mt-6 flex items-center justify-center animate-[fadeIn_1s_ease-out] relative z-30">
                 <select
                   value={aiModel}
                   onChange={(e) => {
@@ -2976,7 +2976,7 @@ Focus on the key sections and content, making it clean and modern.`;
                     }
                     router.push(`/?${params.toString()}`);
                   }}
-                  className="px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#36322F] focus:border-transparent"
+                  className="px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#36322F] focus:border-transparent relative z-30"
                   style={{
                     boxShadow: '0 0 0 1px #e3e1de66, 0 1px 2px #5f4a2e14'
                   }}
