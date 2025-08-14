@@ -2855,7 +2855,7 @@ Focus on the key sections and content, making it clean and modern.`;
                       }
                     }}
                     placeholder=" "
-                    aria-placeholder="https://firecrawl.dev"
+                    aria-placeholder="https://example.com"
                     className="h-[3.25rem] w-full resize-none focus-visible:outline-none focus-visible:ring-orange-500 focus-visible:ring-2 rounded-[18px] text-sm text-[#36322F] px-4 pr-12 border-[.75px] border-border bg-white"
                     style={{
                       boxShadow: '0 0 0 1px #e3e1de66, 0 1px 2px #5f4a2e14, 0 4px 6px #5f4a2e0a, 0 40px 40px -24px #684b2514',
@@ -2870,7 +2870,7 @@ Focus on the key sections and content, making it clean and modern.`;
                     }`}
                   >
                     <span className="text-[#605A57]/50" style={{ fontFamily: 'monospace' }}>
-                      https://firecrawl.dev
+                      https://example.com
                     </span>
                   </div>
                   <button
