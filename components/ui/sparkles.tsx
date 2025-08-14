@@ -41,7 +41,14 @@ export const SparklesCore: React.FC<SparklesProps> = ({
   const mousePosition = React.useRef({ x: 0, y: 0 });
   const animationFrame = React.useRef<number>();
   const canvasSize = React.useRef({ w: 0, h: 0 });
-  const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
+  const [dpr, setDpr] = useState<number>(1);
+
+  useEffect(() => {
+    // Set device pixel ratio after component mounts
+    if (typeof window !== "undefined") {
+      setDpr(window.devicePixelRatio || 1);
+    }
+  }, []);
 
   useEffect(() => {
     if (canvasRef.current) {
