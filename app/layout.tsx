@@ -15,7 +15,7 @@ const atkinsonHyperlegible = Atkinson_Hyperlegible({
 });
 
 export const metadata: Metadata = {
-  title: "Open Lovable",
+  title: "NVAI Re:Imagine",
   description: "Re-imagine any website in seconds with AI-powered website builder.",
 };
 
