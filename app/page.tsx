@@ -4,26 +4,28 @@ export const runtime = "nodejs";
 
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useTranslation } from 'next-i18next';
 import { appConfig } from '@/config/app.config';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 // Import icons from centralized module to avoid Turbopack chunk issues
-import { 
-  FiFile, 
-  FiChevronRight, 
+import {
+  FiFile,
+  FiChevronRight,
   FiChevronDown,
   FiGithub,
-  BsFolderFill, 
+  BsFolderFill,
   BsFolder2Open,
-  SiJavascript, 
-  SiReact, 
-  SiCss3, 
-  SiJson 
+  SiJavascript,
+  SiReact,
+  SiCss3,
+  SiJson
 } from '@/lib/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import CodeApplicationProgress, { type CodeApplicationState } from '@/components/CodeApplicationProgress';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 interface SandboxData {
   sandboxId: string;
@@ -45,15 +47,16 @@ interface ChatMessage {
 }
 
 export default function AISandboxPage() {
+  const { t } = useTranslation('common');
   const [sandboxData, setSandboxData] = useState<SandboxData | null>(null);
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState({ text: 'Not connected', active: false });
+  const [status, setStatus] = useState({ text: t('sandboxNotActive'), active: false });
   const [responseArea, setResponseArea] = useState<string[]>([]);
-  const [structureContent, setStructureContent] = useState('No sandbox created yet');
+  const [structureContent, setStructureContent] = useState(t('noActiveSandbox'));
   const [promptInput, setPromptInput] = useState('');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
-      content: 'Welcome! I can help you generate code with full context of your sandbox files and structure. Just start chatting - I\'ll automatically create a sandbox for you if needed!\n\nTip: If you see package errors like "react-router-dom not found", just type "npm install" or "check packages" to automatically install missing packages.',
+      content: t('welcome') + '\n\n' + t('tip'),
       type: 'system',
       timestamp: new Date()
     }
@@ -248,12 +251,12 @@ export default function AISandboxPage() {
   
   const checkAndInstallPackages = async () => {
     if (!sandboxData) {
-      addChatMessage('No active sandbox. Create a sandbox first!', 'system');
+      addChatMessage(t('noActiveSandbox'), 'system');
       return;
     }
     
     // Vite error checking removed - handled by template setup
-    addChatMessage('Sandbox is ready. Vite configuration is handled by the template.', 'system');
+    addChatMessage(t('sandboxReady'), 'system');
   };
   
   const handleSurfaceError = (errors: any[]) => {
@@ -268,7 +271,7 @@ export default function AISandboxPage() {
   
   const installPackages = async (packages: string[]) => {
     if (!sandboxData) {
-      addChatMessage('No active sandbox. Create a sandbox first!', 'system');
+      addChatMessage(t('noActiveSandbox'), 'system');
       return;
     }
     
@@ -341,19 +344,19 @@ export default function AISandboxPage() {
       
       if (data.active && data.healthy && data.sandboxData) {
         setSandboxData(data.sandboxData);
-        updateStatus('Sandbox active', true);
+        updateStatus(t('sandboxActive'), true);
       } else if (data.active && !data.healthy) {
         // Sandbox exists but not responding
-        updateStatus('Sandbox not responding', false);
+        updateStatus(t('sandboxNotResponding'), false);
         // Optionally try to create a new one
       } else {
         setSandboxData(null);
-        updateStatus('No sandbox', false);
+        updateStatus(t('sandboxNotActive'), false);
       }
     } catch (error) {
       console.error('Failed to check sandbox status:', error);
       setSandboxData(null);
-      updateStatus('Error', false);
+      updateStatus(t('error'), false);
     }
   };
 
@@ -361,7 +364,7 @@ export default function AISandboxPage() {
     console.log('[createSandbox] Starting sandbox creation...');
     setLoading(true);
     setShowLoadingBackground(true);
-    updateStatus('Creating sandbox...', false);
+    updateStatus(t('generatingCode'), false);
     setResponseArea([]);
     setScreenshotError(null);
     
@@ -377,10 +380,10 @@ export default function AISandboxPage() {
       
       if (data.success) {
         setSandboxData(data);
-        updateStatus('Sandbox active', true);
-        log('Sandbox created successfully!');
-        log(`Sandbox ID: ${data.sandboxId}`);
-        log(`URL: ${data.url}`);
+        updateStatus(t('sandboxActive'), true);
+        log(t('sandboxCreated'));
+        log(`${t('sandboxId')}: ${data.sandboxId}`);
+        log(`${t('url')}: ${data.url}`);
         
         // Update URL with sandbox ID
         const newParams = new URLSearchParams(searchParams.toString());
@@ -422,9 +425,9 @@ export default function AISandboxPage() {
         
         // Only add welcome message if not coming from home screen
         if (!fromHomeScreen) {
-          addChatMessage(`Sandbox created! ID: ${data.sandboxId}. I now have context of your sandbox and can help you build your app. Just ask me to create components and I'll automatically apply them!
+          addChatMessage(`${t('sandboxCreated')} ID: ${data.sandboxId}. ${t('scrapedContent')}
 
-Tip: I automatically detect and install npm packages from your code imports (like react-router-dom, axios, etc.)`, 'system');
+${t('tip')}`, 'system');
         }
         
         setTimeout(() => {
@@ -433,13 +436,13 @@ Tip: I automatically detect and install npm packages from your code imports (lik
           }
         }, 100);
       } else {
-        throw new Error(data.error || 'Unknown error');
+        throw new Error(data.error || t('failedToCreateSandbox'));
       }
     } catch (error: any) {
       console.error('[createSandbox] Error:', error);
-      updateStatus('Error', false);
-      log(`Failed to create sandbox: ${error.message}`, 'error');
-      addChatMessage(`Failed to create sandbox: ${error.message}`, 'system');
+      updateStatus(t('error'), false);
+      log(`${t('failedToCreateSandbox')}: ${error.message}`, 'error');
+      addChatMessage(`${t('failedToCreateSandbox')}: ${error.message}`, 'system');
     } finally {
       setLoading(false);
     }
@@ -2773,15 +2776,7 @@ Focus on the key sections and content, making it clean and modern.`;
               alt="Firecrawl"
               className="h-8 w-auto"
             />
-            <a 
-              href="https://github.com/mendableai/open-lovable" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-[#36322F] text-white px-3 py-2 rounded-[10px] text-sm font-medium [box-shadow:inset_0px_-2px_0px_0px_#171310,_0px_1px_6px_0px_rgba(58,_33,_8,_58%)] hover:translate-y-[1px] hover:scale-[0.98] hover:[box-shadow:inset_0px_-1px_0px_0px_#171310,_0px_1px_3px_0px_rgba(58,_33,_8,_40%)] active:translate-y-[2px] active:scale-[0.97] active:[box-shadow:inset_0px_1px_1px_0px_#171310,_0px_1px_2px_0px_rgba(58,_33,_8,_30%)] transition-all duration-200"
-            >
-              <FiGithub className="w-4 h-4" />
-              <span>Use this template</span>
-            </a>
+            <LanguageSwitcher />
           </div>
           
           {/* Main content */}
@@ -3013,33 +3008,33 @@ Focus on the key sections and content, making it clean and modern.`;
               </option>
             ))}
           </select>
-          <Button 
+          <Button
             variant="code"
             onClick={() => createSandbox()}
             size="sm"
-            title="Create new sandbox"
+            title={t('createNewSandbox')}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
           </Button>
-          <Button 
+          <Button
             variant="code"
             onClick={reapplyLastGeneration}
             size="sm"
-            title="Re-apply last generation"
+            title={t('reapplyLastGeneration')}
             disabled={!conversationContext.lastGeneratedCode || !sandboxData}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
           </Button>
-          <Button 
+          <Button
             variant="code"
             onClick={downloadZip}
             disabled={!sandboxData}
             size="sm"
-            title="Download your Vite app as ZIP"
+            title={t('downloadZip')}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
@@ -3382,11 +3377,11 @@ Focus on the key sections and content, making it clean and modern.`;
                     size="sm"
                     asChild
                   >
-                    <a 
-                      href={sandboxData.url} 
-                      target="_blank" 
+                    <a
+                      href={sandboxData.url}
+                      target="_blank"
                       rel="noopener noreferrer"
-                      title="Open in new tab"
+                      title={t('openInNewTab')}
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
